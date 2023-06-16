@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:break_recapta/components/circular_button.dart';
+import 'package:break_recapta/screens/camera_screen.dart';
 import 'package:flutter/material.dart';
 
 class FinishScreen extends StatefulWidget {
@@ -47,7 +49,21 @@ class _FinishScreenState extends State<FinishScreen> {
               color: Colors.white,
               fontSize: 24
             ),
-          )
+          ),
+          CircularButton(
+            label: 'Tentar Novamente',
+            icon: const Icon(Icons.replay),
+            onPressed: () {
+              setState(() {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (BuildContext context) => const CameraScreen(),
+                  ),
+                );
+              });
+            },
+          ),
         ],
       ),
     );
