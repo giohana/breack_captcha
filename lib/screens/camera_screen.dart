@@ -4,10 +4,8 @@ import 'package:break_recapta/components/circular_button.dart';
 import 'package:break_recapta/controller/erosion.dart';
 import 'package:break_recapta/controller/threshold.dart';
 import 'package:break_recapta/controller/smoothing.dart';
-import 'package:break_recapta/gg/text_recognizer_painter.dart';
 import 'package:break_recapta/screens/finish_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -22,13 +20,7 @@ class _CameraScreenState extends State<CameraScreen> {
   final picker = ImagePicker();
   File? _selectedImage;
   bool finish = false;
-  final textRecognizer = TextRecognizer();
 
-  @override
-  void dispose() {
-    textRecognizer.close();
-    super.dispose();
-  }
 
   getImage(ImageSource src) async {
     final pickedFile = await picker.pickImage(source: src);
@@ -140,10 +132,7 @@ class _CameraScreenState extends State<CameraScreen> {
                   var imageSmoothing = SmoothingImage().applySmoothing(_selectedImage);
                   var imageThreshold = ThresholdImage().applyThreshold(imageSmoothing);
                   var imageErosion = ErosionImage().applyErosion(imageThreshold);
-                  //var text = ExtractText().extractTextFromImage(imageErosion!);
-                  final inputImage = InputImage.fromFile(imageErosion!);
-                  final text = await textRecognizer.processImage(inputImage);
-                  
+                  const text = '';
                    setState(() {
                      _selectedImage = imageErosion;
                    });
@@ -171,35 +160,5 @@ class _CameraScreenState extends State<CameraScreen> {
         )
       ],
     );
-  }
-  final _canProcess = true;
-  bool _isBusy = false;
-  CustomPaint? customPaint;
-  String? text = '';
-  final TextRecognizer _textRecognizer =
-  TextRecognizer(script: TextRecognitionScript.latin);
-
-  Future<void> processImage(InputImage inputImage) async {
-    if (!_canProcess) return;
-    if (_isBusy) return;
-    _isBusy = true;
-    setState(() {
-      text = '';
-    });
-    final recognizedText = await _textRecognizer.processImage(inputImage);
-    if (inputImage.metadata?.size != null &&
-        inputImage.metadata?.rotation != null) {
-      final painter = TextRecognizerPainter(recognizedText,
-          inputImage.metadata!.size, inputImage.metadata!.rotation);
-      customPaint = CustomPaint(painter: painter);
-    } else {
-      text = 'Recognized text:\n\n${recognizedText.text}';
-      // TODO: set _customPaint to draw boundingRect on top of image
-      customPaint = null;
-    }
-    _isBusy = false;
-    if (mounted) {
-      setState(() {});
-    }
   }
 }
